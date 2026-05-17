@@ -1,3 +1,4 @@
+from cursos import serializers
 from rest_framework import generics, viewsets, mixins
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
@@ -48,17 +49,25 @@ class CursoViewSet (viewsets.ModelViewSet):
     # Endpoint personalizado para obter as avaliações de um curso específico
     @action(detail=True, methods=['get'])
     def avaliacoes(self, request, pk=None):
-        curso = self.get_object()
-        serializer = AvaliacaoSerializer(curso.avaliacoes.all(), many=True)
+       
+        # Paginação local (mudou nada)
+        self.pagination_class.page_size = 1
+        avaliacoes = Avaliacao.objects.filter(curso_id = pk)
+        page = self.paginate_queryset(avaliacoes)
+
+        if page is not None:
+            serializer = AvaliacaoSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = AvaliacaoSerializer(avaliacoes.all(), many=True)
         return Response(serializer.data)
 
 # VIEWSET PADRÃO:
-'''class AvaliacaoViewSet (viewsets.ModelViewSet):
+class AvaliacaoViewSet (viewsets.ModelViewSet):
     # Viewsets de coleção e indíviduo, porém com menos codigo
     queryset = Avaliacao.objects.all()
-    serializer_class = AvaliacaoSerializer'''
+    serializer_class = AvaliacaoSerializer
 
-# VIEWSET CUSTOMIZADA PARA NÃO POSSIBILITAR O MÉTODO LIST (passa os métodos possíveis como parâmetro da função)
+''' VIEWSET CUSTOMIZADA PARA NÃO POSSIBILITAR O MÉTODO LIST (passa os métodos possíveis como parâmetro da função)
 class AvaliacaoViewSet (mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Avaliacao.objects.all()
-    serializer_class = AvaliacaoSerializer
+    serializer_class = AvaliacaoSerializer'''
