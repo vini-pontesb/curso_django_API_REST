@@ -16,7 +16,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cursos',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken', #Authentication via token
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,8 @@ STATIC_URL = 'static/'
 #DRF
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENT_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.SessionAuthentication', Autenticação via session (é possível ter as duas altenticações)
+        'rest_framework.authentication.TokenAuthentication', # Autenticação via Token
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
